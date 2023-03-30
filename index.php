@@ -11,7 +11,7 @@
         <!-- Blog Entries Column -->
         <div class="col-md-8">
 
-            <?php
+            <?php //Add posts query
             $query = "SELECT * FROM posts";
             $select_posts = mysqli_query($connection, $query);
             while ($row = mysqli_fetch_assoc($select_posts)) {

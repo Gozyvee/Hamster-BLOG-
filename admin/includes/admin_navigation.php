@@ -39,12 +39,12 @@
                                 <a href="#">View All posts</a>
                             </li>
                             <li>
-                                <a href="#">Add posts</a>
+                                <a href="./posts.php">Add posts</a>
                             </li>
                         </ul>
                     </li>
                     <li>
-                        <a href="bootstrap-grid.html"><i class="fa fa-fw fa-wrench"></i> Categories</a>
+                        <a href="./categories.php"><i class="fa fa-fw fa-wrench"></i> Categories</a>
                     </li>
                     </li>
                     <li class="active">

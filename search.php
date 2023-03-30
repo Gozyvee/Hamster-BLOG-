@@ -11,7 +11,7 @@
         <!-- Blog Entries Column -->
         <div class="col-md-8">
 
-            <?php
+            <?php //search bar query
 
 
             if (isset($_POST['submit'])) {
