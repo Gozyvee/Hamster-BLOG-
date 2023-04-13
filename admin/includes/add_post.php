@@ -34,6 +34,7 @@
         <label for="title">Post title</label>
         <input type="text" class="form-control" name="title">
     </div>
+    
     <div class="form-group">
         <select name="post_category" id="">
             <?php 
