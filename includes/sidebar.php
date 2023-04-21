@@ -1,9 +1,5 @@
   <!-- Blog Sidebar Widgets Column -->
   <div class="col-md-4">
-
- 
-
-
 <!-- Blog Search Well -->
 <div class="well">
     <h4>Blog Search</h4>
@@ -16,14 +12,30 @@
         </button>
         </span>
     </div>
-    </form><!--search point-->
-    <!-- /.input-group -->
+    </form>
+</div>
+
+<!-- Login -->
+<div class="well">
+    <h4>Login</h4>
+    <form action="includes/login.php" method="post">
+    <div class="form-group">
+        <input name="username" type="text" class="form-control" placeholder="enter username">
+    </div>
+    
+    <div class="input-group">
+        <input name="password" type="password" class="form-control" placeholder="enter password">
+        <span class="input-group-btn">
+            <button class="btn btn-primary" name="login" type="submit"> Submit </button>
+        </span>
+    </div>
+</form>
 </div>
 
 
 
 
-<!-- Blog Categories Well -->
+<!-- Blog Categories Query -->
 <div class="well">
     <?php 
          $query = "SELECT * FROM categories";
@@ -44,13 +56,9 @@
         ?>
             </ul>
         </div>
-        <!-- /.col-lg-6 -->
-        
-        <!-- /.col-lg-6 -->
     </div>
-    <!-- /.row -->
 </div>
-
+</div>
 
 
 
