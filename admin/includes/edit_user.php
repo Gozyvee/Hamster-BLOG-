@@ -96,7 +96,7 @@
         <input type="password" value="<?php echo $user_password?>" class="form-control" name="user_password">
     </div>
     <div class="form-group">
-        <input type="submit" class="btn btn-primary" name="edit_user" value="Add user">
+        <input type="submit" class="btn btn-primary" name="edit_user" value="Edit user">
     </div>
    
 </form>

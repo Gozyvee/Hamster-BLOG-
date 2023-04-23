@@ -1,46 +1,45 @@
-<?php include "includes/admin_header.php" ?>
-<?php
-if (isset($_SESSION['username'])) {
-    $username = $_SESSION['username'];
+    <?php include "includes/admin_header.php" ?>
+    <?php
 
-    $query = "SELECT * FROM users WHERE username = '{$username}'";
-    $select_user_profile = mysqli_query($connection, $query);
+    if (isset($_SESSION['username'])) {
+        $username = $_SESSION['username'];
 
-    while ($row = mysqli_fetch_array($select_user_profile)) {
-        $user_id = $row['user_id'];
-        $username = $row['username'];
-        $user_password = $row['user_password'];
-        $user_firstname = $row['user_firstname'];
-        $user_lastname = $row['user_lastname'];
-        $user_email = $row['user_email'];
-        $user_role = $row['user_role'];
+        $stmt = $connection->prepare("SELECT * FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            $user_id = $row['user_id'];
+            $username = $row['username'];
+            $user_firstname = $row['user_firstname'];
+            $user_lastname = $row['user_lastname'];
+            $user_email = $row['user_email'];
+            $user_role = $row['user_role'];
+        }
     }
-}
-?>
 
-<?php
-if (isset($_POST['edit_user'])) {
+    if (isset($_POST['edit_user'])) {
+        $user_firstname = $_POST['user_firstname'];
+        $user_lastname = $_POST['user_lastname'];
+        $user_role = $_POST['user_role'];
+        $username = $_POST['username'];
+        $user_email = $_POST['user_email'];
 
-    $user_firstname = $_POST['user_firstname'];
-    $user_lastname = $_POST['user_lastname'];
-    $user_role = $_POST['user_role'];
-    $username = $_POST['username'];
-    $user_email = $_POST['user_email'];
-    $user_password = $_POST['user_password'];
+        // Check if user wants to change the password
+        if (!empty($_POST['user_password'])) {
+            $user_password = password_hash($_POST['user_password'], PASSWORD_DEFAULT);
+            $stmt = $connection->prepare("UPDATE users SET user_firstname = ?, user_lastname = ?, user_role = ?, username = ?, user_email = ?, user_password = ? WHERE username = ?");
+            $stmt->bind_param("sssssss", $user_firstname, $user_lastname, $user_role, $username, $user_email, $user_password, $username);
+        } else {
+            $stmt = $connection->prepare("UPDATE users SET user_firstname = ?, user_lastname = ?, user_role = ?, username = ?, user_email = ? WHERE username = ?");
+            $stmt->bind_param("ssssss", $user_firstname, $user_lastname, $user_role, $username, $user_email, $username);
+        }
+        $stmt->execute();
+    }
 
-    $query = "UPDATE users SET ";
-    $query .= "user_firstname = '{$user_firstname}', ";
-    $query .= "user_lastname = '{$user_lastname}', ";
-    $query .= "user_role = '{$user_role}', ";
-    $query .= "username = '{$username}', ";
-    $query .= "user_email = '{$user_email}', ";
-    $query .= "user_password = '{$user_password}' ";
-    $query .= "WHERE username = '{$username}' ";
-
-    $edit_user_query = mysqli_query($connection, $query);
-    confirm($edit_user_query);
-}
-?>
+    ?>
 
 <div id="wrapper">
 
@@ -51,55 +50,47 @@ if (isset($_POST['edit_user'])) {
             <div class="col-lg-12">
                 <h1 class="page-header">
                     Welcome to admin
-                    <small><?php echo $_SESSION['username']; ?></small>
+                    <small><?php echo htmlspecialchars($username); ?></small>
                 </h1>
+
                 <form action="" method="post" enctype="multipart/form-data">
+
                     <div class="form-group">
                         <label for="title">Firstname</label>
-                        <input type="text" value="<?php echo $user_firstname ?>" class="form-control" name="user_firstname">
+                        <input type="text" value="<?php echo htmlspecialchars($user_firstname); ?>" class="form-control" name="user_firstname">
                     </div>
+
                     <div class="form-group">
                         <label for="title">Lastname</label>
-                        <input type="text" value="<?php echo $user_lastname ?>" class="form-control" name="user_lastname">
+                        <input type="text" value="<?php echo htmlspecialchars($user_lastname); ?>" class="form-control" name="user_lastname">
                     </div>
 
                     <div class="form-group">
                         <select name="user_role">
-                            <option value="subscriber"><?php echo $user_role ?></option>
-                            <?php
-                            if ($user_role === 'admin') {
-                                echo " <option value='subscriber'>subscriber</option>";
-                            } else {
-                                echo " <option value='admin'>admin</option>";
-                            }
-                            ?>
-
-
+                            <option value="subscriber" <?php if ($user_role == 'subscriber') echo ' selected'; ?>>Subscriber</option>
+                            <option value="admin" <?php if ($user_role == 'admin') echo ' selected'; ?>>Admin</option>
                         </select>
                     </div>
+
                     <div class="form-group">
-                        <label for="Username">Username</label>
-                        <input type="text" value="<?php echo $username  ?>" class="form-control" name="username">
+                        <label for="username">Username</label>
+                        <input type="text" value="<?php echo htmlspecialchars($username); ?>" class="form-control" name="username">
                     </div>
+
                     <div class="form-group">
-                        <label for="Email">Email</label>
-                        <input type="email" value="<?php echo $user_email ?>" class="form-control" name="user_email">
+                        <label for="user_password">Password</label>
+                        <input autocomplete="off" type="password" value="<?php echo htmlspecialchars($user_password); ?>" class="form-control" name="user_password">
                     </div>
+
                     <div class="form-group">
-                        <label for="Password">Password</label>
-                        <input type="password" value="<?php echo $user_password ?>" class="form-control" name="user_password">
+                        <label for="user_email">Email</label>
+                        <input type="email" class="form-control mb-2" value="<?php echo htmlspecialchars($user_email); ?>" name="user_email" ; >
                     </div>
-                    <div class="form-group">
-                        <input type="submit" class="btn btn-primary" name="edit_user" value="Edit profile">
+
+                    <div class="form-group mt-4">
+                         <input type="submit" class="btn btn-primary mt-2" name="edit_user" value="Edit profile">
                     </div>
 
                 </form>
-            </div>
 
-
-        </div>
-    </div>
-</div>
-
-
-<?php include "includes/admin_footer.php" ?>
+          <?php include "includes/admin_footer.php" ?>
