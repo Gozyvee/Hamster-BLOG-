@@ -2,7 +2,7 @@
 <?php include "includes/admin_header.php" ?>
 <?php
 
-    if (isset($_SESSION['usernam'])) {
+    if (isset($_SESSION['username'])) {
           $username = $_SESSION['username'];
 
          $stmt = $connection->prepare("SELECT * FROM users WHERE username = ?");
