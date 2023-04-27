@@ -20,38 +20,60 @@
     }
 }
 
+if(isset($_GET['edit_user'])) {
+    $the_user_id = $_GET['edit_user'];
 
-    if(isset($_POST['edit_user'])){
-    
-        $user_firstname = $_POST['user_firstname'];
-        $user_lastname = $_POST['user_lastname'];
-        $user_role = $_POST['user_role'];
-        $username = $_POST['username'];
-        $user_email = $_POST['user_email'];
-        $user_password = $_POST['user_password'];
+    // Use prepared statements to prevent SQL injection
+    $query = "SELECT * FROM users WHERE user_id = ?";
+    $stmt = mysqli_prepare($connection, $query);
+    mysqli_stmt_bind_param($stmt, "i", $the_user_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
+    while ($row = mysqli_fetch_assoc($result)) {
+        $user_id = $row['user_id'];
+        $username = $row['username'];
+        $user_password = $row['user_password'];
+        $user_firstname = $row['user_firstname'];
+        $user_lastname = $row['user_lastname'];
+        $user_email = $row['user_email'];
+        $user_image = $row['user_image'];
+        $user_role = $row['user_role'];
+    }
+}
 
+if(isset($_POST['edit_user'])){
 
-        // $post_image = $_FILES['image']['name'];
-        // $post_image_temp = $_FILES['image']['tmp_name'];
-        // $post_date = date('d-m-y');
-        // move_uploaded_file($post_image_temp, "../images/$post_image");
-       
-        $query = "UPDATE users SET ";
-        $query .= "user_firstname = '{$user_firstname}', ";
-        $query .= "user_lastname = '{$user_lastname}', ";
-        $query .= "user_role = '{$user_role}', ";
-        $query .= "username = '{$username}', ";
-        $query .= "user_email = '{$user_email}', ";
-        $query .= "user_password = '{$user_password}' ";
-        $query .= "WHERE user_id = {$the_user_id} ";
+    $user_firstname = mysqli_real_escape_string($connection, $_POST['user_firstname']); // Sanitize input to prevent XSS attacks
+    $user_lastname = mysqli_real_escape_string($connection, $_POST['user_lastname']);
+    $user_role = mysqli_real_escape_string($connection, $_POST['user_role']);
+    $username = mysqli_real_escape_string($connection, $_POST['username']);
+    $user_email = mysqli_real_escape_string($connection, $_POST['user_email']);
+    $user_password = mysqli_real_escape_string($connection, $_POST['user_password']);
 
-        $edit_user_query = mysqli_query($connection, $query);
-    
-        }
+    // Use password_hash() function with a strong hash algorithm like bcrypt or Argon2 to securely store passwords
+    $user_password = password_hash($user_password, PASSWORD_ARGON2I);
+
+    $query = "UPDATE users SET ";
+    $query .= "user_firstname = ?, ";
+    $query .= "user_lastname = ?, ";
+    $query .= "username = ?, ";
+    $query .= "user_email = ?, ";
+    $query .= "user_password = ? ";
+    $query .= "WHERE user_id = ? ";
+
+    $stmt = mysqli_prepare($connection, $query);
+    mysqli_stmt_bind_param($stmt, "sssssi", $user_firstname, $user_lastname, $username, $user_email, $user_password, $the_user_id);
+    mysqli_stmt_execute($stmt);
+
+    // Use session tokens to prevent session hijacking attacks
+    session_regenerate_id();
+
+    // Redirect to a secure page after successful login
+    header("Location: users.php");
+    exit();
+}
 ?>
-
-
 
 <form action="" method="post" enctype="multipart/form-data">
 <div class="form-group">
@@ -63,7 +85,7 @@
         <input type="text" value="<?php echo $user_lastname ?>" class="form-control" name="user_lastname">
     </div>
 
-    <div class="form-group">
+    <!-- <div class="form-group">
         <select name="user_role" >
             <option value="subscriber"><?php echo $user_role; ?></option>
             <?php 
@@ -76,7 +98,7 @@
           
           
         </select>
-    </div>    
+    </div>     -->
      
     <!-- <div class="form-group">
         <label for="title">Post Image</label>
