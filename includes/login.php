@@ -14,8 +14,7 @@
         $password = mysqli_real_escape_string($connection, $password);
 
         $user_password = password_hash($password, PASSWORD_ARGON2I);
-        $password_verify = password_verify($password, $user_password);
-
+      
         $stmt = $connection->prepare("SELECT * FROM users WHERE username = ?");
         $stmt->bind_param("s", $username);
         $stmt->execute();
