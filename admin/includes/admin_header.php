@@ -4,10 +4,14 @@
 <?php session_start(); ?>
 
 <?php 
-    if(!isset($_SESSION['user_role'])) {
-            header("Location: ../index.php");
-    }
-
+  // Check if the user is logged in and has the admin role
+if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+    // User is authorized, allow access to the page
+} else {
+    // User is not authorized, redirect to login page
+    header("Location: ../index.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -39,6 +43,12 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 
-</head>
+    <!-- <script type="text/javascript" src="https://google.com/jsapi"></script>     -->
+    <!-- <script src="../js/jquery1.js"></script>     -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/37.1.0/classic/ckeditor.js"></script>
 
+   <!-- HTML code with the textarea element and CKEditor 5 Classic editor library -->
+
+</head>
 <body>

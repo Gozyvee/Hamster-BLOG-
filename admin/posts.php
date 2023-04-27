@@ -34,8 +34,6 @@
                     default: 
                     include "includes/view_all_posts.php";
                     break;
-
-                
             }
 
              
@@ -48,5 +46,4 @@
 </div>
 </div>
 <!-- /.container-fluid -->
-
 <?php include "includes/admin_footer.php" ?>

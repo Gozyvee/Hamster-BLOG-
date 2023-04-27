@@ -24,6 +24,9 @@
         '{$post_tags}', '{$post_status}')";
 
         $create_post_query = mysqli_query($connection, $query);
+       $the_post_id = mysqli_insert_id($connection);
+        echo "<p class='bg-success'>Post Created.  <a href='../post.php?p_id={$the_post_id}'> View Posts</a> or <a href='posts.php'>Edit More Posts<a/></p>";
+        
     }
 ?>
 
@@ -61,8 +64,11 @@
         <input type="text" class="form-control" name="author">
     </div>
     <div class="form-group">
-        <label for="title">Post Status</label>
-        <input type="text" class="form-control" name="post_status">
+        <select name="post_status" id="">
+            <option value="draft">Post Status</option>
+            <option value="published">Publish</option>
+            <option value="draft">Draft</option>
+        </select>
     </div>
     <div class="form-group">
         <label for="title">Post Image</label>
@@ -74,7 +80,7 @@
     </div>
     <div class="form-group">
         <label for="title">Post Content</label>
-        <textarea class="form-control" name="post_content" id="" cols="30" rows="10"></textarea>
+        <textarea class="form-control" name="post_content" id="body" cols="30" rows="10"></textarea>
     </div>
     <div class="form-group">
         <input type="submit" class="btn btn-primary" name="create_post" value="Publish post">

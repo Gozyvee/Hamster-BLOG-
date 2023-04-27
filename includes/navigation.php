@@ -15,12 +15,31 @@
                 <ul class="nav navbar-nav">
                     <?php 
                       Categories ();
-                    ?>
+                    ?>   
+                      <li>
+                      <?php 
+                          if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                              // User is authorized, allow access to the nav content
+                              if(isset($_GET['p_id'])) {
+                                  $the_post_id = $_GET['p_id'];
+                                  echo "<a href='admin/posts.php?source=edit_post&p_id={$the_post_id}'> Edit Post</a>";
+                              }
+                          }
+                      ?>
+                  </li>
                   <li>
-                        <a href="admin">Admin</a>
-                    </li>
-                    
-                </ul>
-            </div>
-        </div>
-    </nav>
+                      <?php 
+                          if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                              // User is authorized, allow access to the nav content
+                              echo "<a href='admin'>Admin</a>";
+                              
+                          }
+                      ?>
+                  </li>
+                  <li><a href="registration.php">Registration</a> </li>
+                 
+              </ul>
+          </div>
+      </div>
+  </nav>
+  

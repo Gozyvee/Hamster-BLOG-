@@ -6,7 +6,7 @@
 <!-- Page Content -->
 <div class="container">
 
-    <div class="row">
+    <div class="row ">
 
         <!-- Blog Entries Column -->
         <div class="col-md-8">
@@ -43,7 +43,6 @@
                 <img class="img-responsive" src="images/<?php echo $post_image; ?>" alt="">
                 <hr>
                 <p><?php echo $post_content ?></p>
-                <a class="btn btn-primary" href="#">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
                 <hr>
         
     <?php }

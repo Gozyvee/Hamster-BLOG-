@@ -47,7 +47,7 @@
         $query .= "WHERE user_id = {$the_user_id} ";
 
         $edit_user_query = mysqli_query($connection, $query);
-       confirm($edit_user_query);
+    
         }
 ?>
 

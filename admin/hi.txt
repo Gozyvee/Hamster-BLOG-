@@ -1,3 +1,12 @@
+//Display dashboard widgets
+<?php
+ $query = "SELECT * FROM categories";
+ $select_all_categories = mysqli_query($connection, $query);
+ $category_count = mysqli_num_rows($select_all_categories);
+
+  echo " <div class='huge'>{$category_count}</div>";
+?>     
+
 //PROFILE
 <?php include "includes/admin_header.php" ?>
 <?php

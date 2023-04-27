@@ -1,3 +1,58 @@
+//Display charts
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <?php
+      $element_text = ['Active Posts', 'Categories', 'Users', 'Comments'];
+      $element_count = [$post_count, $category_count, $user_count, $comment_count];
+      $data_array = array();
+
+     $data_array[] = array('Element', 'Count');
+      for ($i = 0; $i < 4; $i++) {
+          $data_array[] = array($element_text[$i], $element_count[$i]);
+      }
+
+      $data_json = json_encode($data_array);
+     ?>
+   <script type="text/javascript">
+        google.charts.load('current', {'packages':['bar']});
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable(<?php echo $data_json; ?>);
+
+            var options = {
+                 chart: {
+                        title: '',
+                        subtitle: '',
+                        }
+               };
+
+           var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+    </script>
+<div id="columnchart_material" style="width: auto; height: 500px;"></div>
+
+$stmt = mysqli_prepare($connection, "SELECT COUNT(*) as subscriber_count FROM users WHERE user_role = ?");
+$user_role = 'subscriber';
+mysqli_stmt_bind_param($stmt, 's', $user_role);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_result($stmt, $subscriber_count);
+mysqli_stmt_fetch($stmt);
+mysqli_stmt_close($stmt);
+
+
+
+
+//display dashboard widgets
+ $stmt = $connection->prepare("SELECT * FROM categories");
+ $stmt->execute();
+$result = $stmt->get_result();
+$category_count = $result->num_rows;
+
+echo " <div class='huge'>{$category_count}</div>";
+
+
 //profile
 <?php include "includes/admin_header.php" ?>
 <?php
@@ -91,6 +146,18 @@
         </div>
     </form>
 <?php include "includes/admin_footer.php" ?>
+
+//WHITELISTING
+ // Define a list of allowed characters
+  $allowed_characters = '/^[a-zA-Z0-9@.]+$/';
+
+// Validate user input against the allowed characters
+if (preg_match($allowed_characters, $user_input)) {
+    // User input is valid
+} else {
+    // User input is not valid
+}
+
 
 ///login query
   <?php include "db.php"; ?>

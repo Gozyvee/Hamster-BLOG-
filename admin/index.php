@@ -2,8 +2,8 @@
 
     <div id="wrapper">
 
-<?php include "includes/admin_navigation.php" ?>
-    <div id="page-wrapper">
+            <?php include "includes/admin_navigation.php" ?>
+     <div id="page-wrapper">
 
          <div class="container-fluid">
                 <!-- Page Heading -->
@@ -134,4 +134,57 @@
         </div>
     </div>
  </div>
-<?php include "includes/admin_footer.php"?>
+ <?php 
+      $query = "SELECT * FROM posts WHERE post_status = 'published'";
+      $select_all_published_post = mysqli_query($connection, $query);
+      $publish_count = mysqli_num_rows($select_all_published_post);
+
+      $query = "SELECT * FROM posts WHERE post_status = 'draft'";
+      $select_all_draft_post = mysqli_query($connection, $query);
+      $post_draft_count = mysqli_num_rows($select_all_draft_post);
+
+      $query = "SELECT * FROM comments WHERE comment_status = 'unapproved'";
+      $select_all_unapproved_comment = mysqli_query($connection, $query);
+      $unapproved_comment_count = mysqli_num_rows($select_all_unapproved_comment);
+
+      $query = "SELECT * FROM users WHERE user_role = 'subscriber'";
+      $select_all_subscribers = mysqli_query($connection, $query);
+      $subscriber_count = mysqli_num_rows($select_all_subscribers);
+
+      
+ ?>
+ <div class="">
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Data', 'Count'],
+
+          <?php
+          
+             $element_text  = ['All posts', 'Active Posts', 'Draft Posts', 'Comments', 'Unapproved Comments', 'Users', 'Subscriber Count', 'Categories'];
+             $element_count  = [$post_count, $publish_count, $post_draft_count, $comment_count, $unapproved_comment_count, $user_count,$subscriber_count, $category_count];
+
+             for($i = 0; $i < 8; $i++){
+                echo "['{$element_text[$i]}'" . "," . "{$element_count[$i]}],";
+             }
+          ?>
+        ]);
+
+        var options = {
+          chart: {
+            title: '',
+            subtitle: '',
+          }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+    <div id="columnchart_material" style="width: '100px'; height: 500px;"></div>
+ </div>
+ <?php include "includes/admin_footer.php"?>
