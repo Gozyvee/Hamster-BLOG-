@@ -1,13 +1,15 @@
-<?php 
-$db['db_host'] = "localhost";
-$db['db_user'] = "root";
-$db['db_pass'] = "";
-$db['db_name'] = "cms";
+<?php
+// Define database credentials
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'cms');
 
-foreach($db as $key => $value){
+// Connect to database using MySQLi object-oriented approach
+$connection = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
-    define(strtoupper($key), $value);
-};
-$connection = mysqli_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-
+// Check for connection errors
+if ($connection->connect_error) {
+    die("Connection failed: " . $connection->connect_error);
+}
 ?>
