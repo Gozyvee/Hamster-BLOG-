@@ -28,7 +28,7 @@ is_authenticated();
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> Admin Template</title>
+    <title> Admin </title>
 
     <!-- Bootstrap Core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -48,10 +48,15 @@ is_authenticated();
 
     <!-- <script type="text/javascript" src="https://google.com/jsapi"></script>     -->
     <!-- <script src="../js/jquery1.js"></script>     -->
+    <link href="css/loader.css" rel="stylesheet">
+    <script src="js/jquery.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/37.1.0/classic/ckeditor.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
    <!-- HTML code with the textarea element and CKEditor 5 Classic editor library -->
 
 </head>
 <body>
+

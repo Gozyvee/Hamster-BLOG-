@@ -19,6 +19,30 @@
                 $query = "DELETE FROM posts WHERE post_id = {$key}";
                 $update_status = mysqli_query($connection, $query);
                 break;
+
+                case 'clone';
+                $query = "SELECT * FROM posts WHERE post_id = '{$key}'";
+                $clone_query = mysqli_query($connection, $query);
+                while($row = mysqli_fetch_array($clone_query)){
+                    $post_title = $row['post_title'];
+                    $post_category_id = $row['post_category_id'];
+                    $post_date = $row['post_date'];
+                    $post_author = $row['post_author'];
+                    $post_status = $row['post_status'];
+                    $post_image = $row['post_image'];
+                    $post_tags = $row['post_tags'];
+                    $post_content = $row['post_content'];
+
+                    $query = "INSERT INTO posts(post_category_id, post_title, post_author, post_date,
+                          post_image, post_content, post_tags, post_status)";
+                      $query .= "VALUES({$post_category_id}, '{$post_title}', '{$post_author}', now(), '{$post_image}', '{$post_content}', 
+                    '{$post_tags}', '{$post_status}')";
+                    
+                    $copy_query = mysqli_query($connection, $query);
+                    confirm($copy_query);
+                    break;
+                }
+                break;
            }
         }
     }
@@ -32,6 +56,7 @@
             <option value="published">Publish</option>
             <option value="draft">Draft</option>
             <option value="delete">Delete</option>
+            <option value="clone">Clone</option>
         </select>
     </div>
     <div class="col-xs-4">
@@ -53,11 +78,12 @@
                     <th>View</th>
                     <th>Edit</th>
                     <th>Delete</th>
+                    <th>Views</th>
                 </tr>
             </thead>
             <tbody>
                 <?php  //display post query
-                     $query = "SELECT * FROM posts";
+                     $query = "SELECT * FROM posts ORDER BY post_id DESC";
                      $select_posts = mysqli_query($connection, $query);
              
                      while ($row = mysqli_fetch_assoc($select_posts)) {
@@ -70,6 +96,7 @@
                          $post_tags = $row['post_tags'];
                          $post_comment_count = $row['post_comment_count'];
                          $post_date = $row['post_date'];
+                         $post_view = $row['post_view_count'];
 
                          echo "<tr>";
 
@@ -99,6 +126,7 @@
                          echo "<td> <a href='../post.php?p_id={$post_id} '>View Post</a></td>";
                          echo "<td> <a href='posts.php?source=edit_post&p_id=$post_id'>Edit</a></td>";
                          echo "<td> <a onClick=\"javascript: return confirm('Deleted posts cannot be recovered')\" href='posts.php?delete=$post_id'>Delete</a></td>";
+                         echo "<td><a href='posts.php?reset=$post_id'>{$post_view}</a></td>";
                          echo "</tr>";
                      }
                 ?>      
@@ -111,6 +139,13 @@
                 $the_post_id = $_GET['delete'];
 
                 $query = "DELETE FROM posts WHERE post_id = {$the_post_id}";
+                $the_delete_query = mysqli_query($connection, $query);
+                header("location: posts.php");
+            }
+            if(isset($_GET['reset'])){
+                $the_post_id = $_GET['reset'];
+
+                $query = "UPDATE posts SET post_view_count = 0 WHERE post_id=" . mysqli_real_escape_string($connection, $the_post_id) . "";
                 $the_delete_query = mysqli_query($connection, $query);
                 header("location: posts.php");
             }
