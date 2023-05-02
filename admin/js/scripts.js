@@ -1,3 +1,9 @@
+document.addEventListener("DOMContentLoaded", function(event) {
+    ClassicEditor
+      .create( document.querySelector( '#body' ) )
+      
+  });
+
   $(document).ready(function(){
     $('#selectAllBoxes').click(function(event){
         if(this.checked) {
@@ -30,18 +36,13 @@ setTimeout(function() {
   body.removeChild(loadScreen);
 }, 7000);
 
-function loadUsersOnline() {
-    $.get("functions.php?onlineusers=result", function(data){
-        $(".usersonline").text(data);
-    });
-    console.log("Message to display in the console");
-    console.log(data);
+// function loadUsersOnline() {
+//     $.get("index.php", function(data){
+//         $("#online-user-count").text(data);
+//     });
+// }
 
-}
-
-setInterval(function () {
-    loadUsersOnline();
-}, 500);
-
-loadUsersOnline();
+// setInterval(function () {
+//     loadUsersOnline();
+// }, 500)
 

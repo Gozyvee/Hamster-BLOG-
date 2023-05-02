@@ -1,7 +1,7 @@
 <?php include "includes/admin_header.php"; ?>
 
     <div id="wrapper">
-<?php 
+ <?php 
      $session = session_id();
      $time = time();
      $time_out_in_seconds = 02;
@@ -18,9 +18,9 @@
      }
  
      $users_online_query = mysqli_query($connection, "SELECT * FROM users_online WHERE time > '{$time_out}'");
-     $_SESSION['users_online'] = $count_user = mysqli_num_rows( $users_online_query);
+     $count_user = mysqli_num_rows( $users_online_query);
     
-?>
+?> 
 
  <?php include "includes/admin_navigation.php" ?>
      <div id="page-wrapper">
