@@ -4,6 +4,7 @@
 <?php session_start(); ?>
 
 <?php 
+
   // Check if the user is logged in and has the admin role
 if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
     // User is authorized, allow access to the page
@@ -12,8 +13,31 @@ if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
     header("Location: ../index.php");
     exit();
 }
-
-is_authenticated();
+if (isset($_SESSION['session_token']) && isset($_SESSION['user_id'])) {
+    // Get the session token and user ID from the session
+    $session_token = $_SESSION['session_token'];
+    $user_id = $_SESSION['user_id'];
+    
+    // Check if the session token exists in the database
+    $stmt = $connection->prepare("SELECT * FROM sessions WHERE session_token = ? AND user_id = ?");
+    $stmt->bind_param("si", $session_token, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows == 1) {
+      // Session token found, check if it has expired
+      $row = $result->fetch_assoc();
+      $expiry_time = strtotime($row['expiry_time']);
+      
+      if ($expiry_time > time()) {
+        // Session token is valid and has not expired
+        return true;
+      } else {
+          // Session token is invalid or has expired
+           return false;
+      }
+    }
+  } 
 
 ?>
 
@@ -50,9 +74,11 @@ is_authenticated();
     <!-- <script src="../js/jquery1.js"></script>     -->
     <link href="css/loader.css" rel="stylesheet">
     <script src="js/jquery.js"></script>
+    <script src="js/bootstrap.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/37.1.0/classic/ckeditor.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- <script src="https://cdn.ckeditor.com/ckeditor5/37.1.0/classic/ckeditor.js"></script> -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.js" integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E=" crossorigin="anonymous"></script>
 
 
    <!-- HTML code with the textarea element and CKEditor 5 Classic editor library -->
