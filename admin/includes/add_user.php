@@ -1,31 +1,35 @@
-<?php 
-    if(isset($_POST['create_user'])){
-        $user_firstname = $_POST['user_firstname'];
-        $user_lastname = $_POST['user_lastname'];
-        $user_role = $_POST['user_role'];
-        $username = $_POST['username'];
-        $user_email = $_POST['user_email'];
-        $user_password = $_POST['user_password'];
+<?php
+if (isset($_POST['create_user'])) {
+    $user_lastname = escape($_POST['user_lastname']);
+    $user_firstname = escape($_POST['user_firstname']);
+    $username = escape($_POST['username']);
+    $user_email = escape($_POST['user_email']);
+    $user_password = escape($_POST['user_password']);
+    $user_role = escape($_POST['user_role']);
 
+    $password = password_hash($user_password, PASSWORD_ARGON2I);
 
+    $query = "INSERT INTO users( user_firstname, user_lastname, user_role, username, user_email, user_password) ";
+    $query .= "VALUES(?, ?, ?, ?, ?, ?)";
+    $stmt = mysqli_prepare($connection, $query);
+    mysqli_stmt_bind_param($stmt, "ssssss", $user_firstname, $user_lastname, $user_role, $username, $user_email, $password);
+    $create_user_query = mysqli_stmt_execute($stmt);
 
-        // $post_image = $_FILES['image']['name'];
-        // $post_image_temp = $_FILES['image']['tmp_name'];
-        // $post_date = date('d-m-y');
-        // move_uploaded_file($post_image_temp, "../images/$post_image");
-        
-        $query = "INSERT INTO users( user_firstname, user_lastname, user_role, username, user_email, user_password) ";
-        $query .= "VALUES( ' {$user_firstname}', '{$user_lastname}', '{$user_role}', '{$username}', '{$user_email}', '{$user_password} ' ) ";
-        $create_user_query = mysqli_query($connection, $query);
-    
-        echo "User Created: " . " " . "<a href='users.php'>View Users</a>";
-    }
+    // Use session tokens to prevent session hijacking attacks
+    session_regenerate_id();
+
+    // echo "User Created: " . " " . "<a href='users.php'>View Users</a>";
+
+    // Redirect to a secure page after successful login
+    header("Location: users.php");
+    exit();
+}
 ?>
 
 
 
 <form action="" method="post" enctype="multipart/form-data">
-<div class="form-group">
+    <div class="form-group">
         <label for="title">Firstname</label>
         <input type="text" class="form-control" name="user_firstname">
     </div>
@@ -35,17 +39,12 @@
     </div>
 
     <div class="form-group">
-        <select name="user_role" >
-            <option value="Subscriber">Select options</option>
-            <option value="Admin">Admin</option>
-            <option value="Subscriber">Subscriber</option>
+        <select name="user_role">
+            <option value="subscriber">Select options</option>
+            <option value="admin">Admin</option>
+            <option value="subscriber">Subscriber</option>
         </select>
-    </div>    
-     
-    <!-- <div class="form-group">
-        <label for="title">Post Image</label>
-        <input type="file" class="form-control" name="">
-    </div> -->
+    </div>
 
     <div class="form-group">
         <label for="Username">Username</label>
@@ -62,5 +61,5 @@
     <div class="form-group">
         <input type="submit" class="btn btn-primary" name="create_user" value="Add user">
     </div>
-   
+
 </form>

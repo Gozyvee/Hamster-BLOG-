@@ -1,68 +1,76 @@
-<?php 
-    if(isset($_POST['create_post'])){
-        $post_title = $_POST['title'];
-        $post_author = $_POST['author'];
-        $post_category_id = $_POST['post_category'];
-        $post_status = $_POST['post_status'];
+<?php
+if (isset($_POST['create_post'])) {
+    $post_title = escape($_POST['title']);
+    $post_user = escape($_POST['post_user']);
+    $post_category_id = escape($_POST['post_category']);
+    $post_status = escape($_POST['post_status']);
 
+    $post_image = escape($_FILES['image']['name']);
+    $post_image_temp = escape($_FILES['image']['tmp_name']);
 
-        $post_image = $_FILES['image']['name'];
-        $post_image_temp = $_FILES['image']['tmp_name'];
+    $post_tags = escape($_POST['post_tags']);
+    $post_content = escape($_POST['post_content']);
+    $post_date = escape(date('d-m-y'));
 
+    $stmt = mysqli_prepare($connection, "INSERT INTO posts(post_category_id, post_title, post_user, post_date, post_image, post_content, post_tags, post_status) VALUES (?, ?, ?, now(), ?, ?, ?, ?)");
 
-        $post_tags = $_POST['post_tags'];
-        $post_content = $_POST['post_content'];
-        $post_date = date('d-m-y');
-        // $post_comment_count = 4;
+    mysqli_stmt_bind_param($stmt, "issssss", $post_category_id, $post_title, $post_user, $post_image, $post_content, $post_tags, $post_status);
 
+    mysqli_stmt_execute($stmt);
 
-        move_uploaded_file($post_image_temp, "../images/$post_image");
-        
-        $query = "INSERT INTO posts(post_category_id, post_title, post_author, post_date,
-        post_image, post_content, post_tags, post_status)";
-        $query .= "VALUES({$post_category_id}, '{$post_title}', '{$post_author}', now(), '{$post_image}', '{$post_content}', 
-        '{$post_tags}', '{$post_status}')";
+    $the_post_id = mysqli_insert_id($connection);
 
-        $create_post_query = mysqli_query($connection, $query);
-       $the_post_id = mysqli_insert_id($connection);
-        echo "<p class='bg-success'>Post Created.  <a href='../post.php?p_id={$the_post_id}'> View Posts</a> or <a href='posts.php'>Edit More Posts<a/></p>";
-        
-    }
+    move_uploaded_file($post_image_temp, "../images/$post_image");
+
+    echo "<p class='bg-success'>Post Created. <a href='../post.php?p_id={$the_post_id}'>View Posts</a> or <a href='posts.php'>Edit More Posts<a/></p>";
+}
 ?>
-
-
 
 <form action="" method="post" enctype="multipart/form-data">
     <div class="form-group">
         <label for="title">Post title</label>
         <input type="text" class="form-control" name="title">
     </div>
-    
+
     <div class="form-group">
+        <label for="Categories">Categories</label>
         <select name="post_category" id="">
-            <?php 
-                  $query = "SELECT * FROM categories";
-                  $select_categories = mysqli_query($connection, $query);
+            <?php
+            $stmt = mysqli_prepare($connection, "SELECT cat_id, cat_title FROM categories");
 
-                  confirm($select_categories);
+            mysqli_stmt_execute($stmt);
 
-                  while ($row = mysqli_fetch_assoc($select_categories)) {
-                      $cat_id = $row['cat_id'];
-                      $cat_title = $row['cat_title'];
-                    
-                      echo "<option value='$cat_id'>{$cat_title}</option>";
-                      
-                    }
+            $result = mysqli_stmt_get_result($stmt);
 
+            while ($row = mysqli_fetch_assoc($result)) {
+                $cat_id = $row['cat_id'];
+                $cat_title = $row['cat_title'];
+                echo "<option value='$cat_id'>{$cat_title}</option>";
+            }
+            mysqli_stmt_close($stmt);
             ?>
-        </select>   
+        </select>
+    </div>
 
-    </div>
-   
     <div class="form-group">
-        <label for="title">Post Author</label>
-        <input type="text" class="form-control" name="author">
+        <label for="users">Users</label>
+        <select name="post_user" id="">
+            <?php
+            $query = "SELECT user_id, username FROM users";
+            $stmt = mysqli_prepare($connection, $query);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+
+            while ($row = mysqli_fetch_assoc($result)) {
+                $user_id = $row['user_id'];
+                $username = $row['username'];
+
+                echo "<option value='$username'>{$username}</option>";
+            }
+            ?>
+        </select>
     </div>
+
     <div class="form-group">
         <select name="post_status" id="">
             <option value="draft">Post Status</option>
@@ -85,5 +93,5 @@
     <div class="form-group">
         <input type="submit" class="btn btn-primary" name="create_post" value="Publish post">
     </div>
-   
+
 </form>

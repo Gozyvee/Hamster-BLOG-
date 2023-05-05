@@ -1,39 +1,41 @@
-
 <form action="#" method="post">
-            <div class="form-group">
-                <label for="cat_title">Edit Category</label>
+    <div class="form-group">
+        <label for="cat_title">Edit Category</label>
 
-                <?php //update query
+        <?php //update query
 
-                    if (isset($_GET['update'])) {
-                        $cat_id = $_GET['update'];
-                        $query = "SELECT * FROM categories WHERE cat_id = {$cat_id} ";
-                        $select_categories_id = mysqli_query($connection, $query);
+        if (isset($_GET['update'])) {
+            $cat_id = $_GET['update'];
 
-                        while ($row = mysqli_fetch_assoc($select_categories_id)) {
-                            $cat_id = $row['cat_id'];
-                            $cat_title = $row['cat_title'];
-                        }
-                    ?>
+            $stmt = $connection->prepare("SELECT * FROM categories WHERE cat_id = ?");
+            $stmt->bind_param("i", $cat_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
 
-                <?php } ?>
-                <?php
-                    if (isset($_POST['update_category'])) {
-                        $the_cat_title = $_POST['cat_title'];
-                        $query = "UPDATE categories SET cat_title = '{$the_cat_title}' WHERE cat_id = {$cat_id}";
-                        $update_query = mysqli_query($connection, $query);
+            while ($row = $result->fetch_assoc()) {
+                $cat_id = $row['cat_id'];
+                $cat_title = $row['cat_title'];
+            }
 
-                        
-                    if (!$update_query) {
-                    die("QUERY FAILED" . mysqli_error($connection));
-                     } 
-                        header("Location: categories.php");
-                    } 
-                    ?>
-                <input value="<?php if (isset($cat_title)) { echo $cat_title;}  ?>" type="text" class="form-control" name="cat_title">
 
-            </div>
-            <div class="form-group">
-                <input class="btn btn-primary" type="submit" name="update_category" value="Update category">
-            </div>
-        </form>
+        ?>
+
+        <?php } ?>
+        <?php
+        if (isset($_POST['update_category'])) {
+            $the_cat_title = $_POST['cat_title'];
+
+            $query = "UPDATE categories SET cat_title = ? WHERE cat_id = ?";
+            $stmt = $connection->prepare($query);
+            $stmt->bind_param("si", $the_cat_title, $cat_id);
+            $update_query = $stmt->execute();
+            confirm($update_query);
+            header("Location: categories.php");
+        }
+        ?>
+        <input value="<?php echo1($cat_title) ?>" type="text" class="form-control" name="cat_title">
+    </div>
+    <div class="form-group">
+        <input class="btn btn-primary" type="submit" name="update_category" value="Edit category">
+    </div>
+</form>

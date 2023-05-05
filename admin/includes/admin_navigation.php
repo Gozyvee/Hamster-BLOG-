@@ -13,11 +13,14 @@
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
 
-                <li><a href="">Users Online: <span id="online-user-count"></span> </a></li>
+                <!-- <li><a href="">Users Online: <span id="online-user-count"></span> </a></li> -->
                 
                 <li><a href="../index.php">Home</a></li>
                    <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> <?php echo $_SESSION['firstname']; ?> <b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <i class="fa fa-user"> </i> <?php echo $_SESSION['firstname']; ?> 
+                        <b class="caret"></b>
+                    </a>
                     <ul class="dropdown-menu">
                         <li>
                             <a href="profile.php"><i class="fa fa-fw fa-user"></i> Profile</a>
@@ -67,7 +70,7 @@
                             </li>
                         </ul>
                     </li>
-                    <li><a href="#"><i class="fa fa-fw fa-dashboard"></i> Profile</a></li>
+                    <li><a href="profile.php"><i class="fa fa-fw fa-dashboard"></i> Profile</a></li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
