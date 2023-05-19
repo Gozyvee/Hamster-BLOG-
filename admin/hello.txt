@@ -1,3 +1,14 @@
+     // Set the session cookie with the HttpOnly and Secure flags
+              $cookie_options = array(
+                'expires' => $expiry_time,
+                'path' => '/',
+                'domain' => $_SERVER['HTTP_HOST'],
+                'secure' => true,
+                'httponly' => true,
+                'samesite' => 'Strict'
+            );
+            setcookie(session_name(), session_id(), $cookie_options);
+
 //Display charts
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <?php

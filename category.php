@@ -16,18 +16,22 @@
               $post_category_id = $_GET['category'];
           
               // Prepare and execute the query with a parameterized statement to prevent SQL injection
-              $query = "SELECT * FROM posts WHERE post_category_id = ?";
+              $query = "SELECT * FROM posts WHERE post_category_id = ? AND post_status = 'published'";
               $stmt = mysqli_prepare($connection, $query);
               mysqli_stmt_bind_param($stmt, "i", $post_category_id);
               mysqli_stmt_execute($stmt);
           
               $result = mysqli_stmt_get_result($stmt);
+
+              if(mysqli_num_rows($result) < 1) {
+                echo "<h1>No Post</h1>";
+              }
           
               // Loop through the results and display each post
               while ($row = mysqli_fetch_assoc($result)) {
                   $post_id = $row['post_id'];
                   $post_title = $row['post_title'];
-                  $post_author = $row['post_author'];
+                  $post_author = $row['post_user'];
                   $post_date = $row['post_date'];
                   $post_image = $row['post_image'];
                   $post_content = substr($row['post_content'], 0, 100);

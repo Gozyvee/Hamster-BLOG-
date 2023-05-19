@@ -31,6 +31,9 @@ $result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
 $count = $row['count'];
 $count = ceil($count / 5);
+if($count < 1) {
+    echo "<h1>No Posts</h1>";
+}else{
 
 // Get posts for current page
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
@@ -76,7 +79,7 @@ foreach ($rows as $row) {
     <a class="btn btn-primary" href="post.php?p_id=<?php echo htmlspecialchars($post_id); ?>">Read More <span class="glyphicon glyphicon-chevron-right"></span></a>
     <hr>
     
-    <?php } ?>
+    <?php } } ?>
 </div> 
 <?php include "includes/sidebar.php"; ?>
 

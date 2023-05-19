@@ -26,16 +26,16 @@ function insert_categories()
         if ($cat_title == "" || empty($cat_title)) {
             echo "This field should not be empty";
         } else {
-            $query = "INSERT INTO categories(cat_title) ";
-            $query .= "VALUES('{$cat_title}')";
-
-            $create_category = mysqli_query($connection, $query);
-
-            if (!$create_category) {
-                die("QUERY FAILED" . mysqli_error($connection));
-            }
+            $query = "INSERT INTO categories(cat_title) VALUES(?)";
+            $stmt = mysqli_prepare($connection, $query);
+            mysqli_stmt_bind_param($stmt, "s", $cat_title);
+            mysqli_stmt_execute($stmt);
+            $create_category = mysqli_stmt_affected_rows($stmt);
+            mysqli_stmt_close($stmt);
+            
         }
     }
+    return;
 }
 
 function approve_comment()

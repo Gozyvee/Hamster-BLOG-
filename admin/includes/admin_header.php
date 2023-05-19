@@ -73,7 +73,7 @@ if (isset($_SESSION['session_token']) && isset($_SESSION['user_id'])) {
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <!-- HTML code with the textarea element and CKEditor 5 Classic editor library -->
   <script src="https://cdn.ckeditor.com/ckeditor5/37.1.0/classic/ckeditor.js"></script>
-
+  <script src="js/jquery.js"></script>
 </head>
 
 <body>
