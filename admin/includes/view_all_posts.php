@@ -152,10 +152,9 @@ if (isset($_POST['checkBoxArray'])) {
                 echo "<td><a href='post_comments.php?id=$post_id'>$count_comments</a></td>";
 
                 echo "<td>{$post_date}</td>";
-                echo "<td> <a href='./post.php?p_id={$post_id} '>View Post</a></td>";
+                echo "<td> <a href='../post.php?p_id={$post_id} '>View Post</a></td>";
                 echo "<td> <a href='posts.php?source=edit_post&p_id=$post_id'>Edit</a></td>";
                 echo "<td> <a href='javascript:void(0)' class='delete_link' rel='{$post_id}' >Delete</a></td>";
-                // echo "<td> <a onClick=\"javascript: return confirm('Deleted posts cannot be recovered')\" href='posts.php?delete=$post_id'>Delete</a></td>";
                 echo "<td><a href='posts.php?reset=$post_id'>{$post_view}</a></td>";
                 echo "</tr>";
             }

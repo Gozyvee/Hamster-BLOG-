@@ -16,20 +16,26 @@
                 $view_post_query = "UPDATE posts SET post_view_count = post_view_count + 1 WHERE post_id = $the_post_id";
                 $send_query = mysqli_query($connection, $view_post_query);
 
-            $query = "SELECT * FROM posts WHERE post_id = $the_post_id";
-            $select_posts = mysqli_query($connection, $query);
-            while ($row = mysqli_fetch_assoc($select_posts)) {
-                $post_title = $row['post_title'];
-                $post_user = $row['post_user'];
-                $post_date = $row['post_date'];
-                $post_image = $row['post_image'];
-                $post_content = $row['post_content'];
+                if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                      $query = "SELECT * FROM posts WHERE post_id = $the_post_id";
+                }else{
+                    $query = "SELECT * FROM posts WHERE post_id = $the_post_id AND post_status = 'published' ";
+                }
+                $select_posts = mysqli_query($connection, $query);
+                if(mysqli_num_rows($select_posts) < 1) {
+                    echo "<h1> No Posts Available</h1>";
+                } else {
+                 while ($row = mysqli_fetch_assoc($select_posts)) {
+                    $post_title = $row['post_title'];
+                    $post_user = $row['post_user'];
+                    $post_date = $row['post_date'];
+                    $post_image = $row['post_image'];
+                    $post_content = $row['post_content'];
 
             ?>
 
                 <h1 class="page-header">
-                    Page Heading
-                    <small>Secondary Text</small>
+                    Posts
                 </h1>
 
                 <!-- First Blog Post -->
@@ -46,9 +52,7 @@
                 <p><?php echo $post_content ?></p>
                 <hr>
         
-    <?php }} else {
-        header("Location: index.php");
-    }
+    <?php }
     ?>
 
     
@@ -128,7 +132,9 @@
                     </div>
                 </div>
 
-                    <?php }?>
+                    <?php }} } else {
+        header("Location: index.php");
+    }?>
                  
 
                

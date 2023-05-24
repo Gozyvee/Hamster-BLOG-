@@ -24,21 +24,26 @@
 
 <?php
 // Get total number of posts
-$post_query_count = "SELECT COUNT(*) as count FROM posts WHERE post_status = 'published'";
+
+if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+    $post_query_count = "SELECT COUNT(*) as count FROM posts ";
+  } else {
+    $post_query_count = "SELECT COUNT(*) as count FROM posts WHERE post_status = 'published'";
+  }
 $stmt = mysqli_prepare($connection, $post_query_count);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
 $count = $row['count'];
-$count = ceil($count / 5);
 if($count < 1) {
     echo "<h1>No Posts</h1>";
 }else{
+$count = ceil($count / 5);
 
 // Get posts for current page
 $page = isset($_GET['page']) ? $_GET['page'] : 1;
 $page_1 = ($page - 1) * 5;
-$post_query = "SELECT * FROM posts WHERE post_status = 'published' ORDER BY post_date DESC LIMIT ?, 5";
+$post_query = "SELECT * FROM posts ORDER BY post_date DESC LIMIT ?, 5";
 $stmt = mysqli_prepare($connection, $post_query);
 mysqli_stmt_bind_param($stmt, "i", $page_1);
 mysqli_stmt_execute($stmt);

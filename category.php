@@ -14,9 +14,15 @@
           // Ensure that the category ID is set and is an integer
           if(isset($_GET['category']) && is_numeric($_GET['category'])) {
               $post_category_id = $_GET['category'];
+
+              if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                $query = "SELECT * FROM posts WHERE post_category_id = ?";
+              } else {
+                $query = "SELECT * FROM posts WHERE post_category_id = ? AND post_status = 'published'";
+              }
           
               // Prepare and execute the query with a parameterized statement to prevent SQL injection
-              $query = "SELECT * FROM posts WHERE post_category_id = ? AND post_status = 'published'";
+             
               $stmt = mysqli_prepare($connection, $query);
               mysqli_stmt_bind_param($stmt, "i", $post_category_id);
               mysqli_stmt_execute($stmt);
