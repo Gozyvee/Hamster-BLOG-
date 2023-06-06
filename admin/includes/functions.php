@@ -1,19 +1,49 @@
 <?php
-function echo1 ($string){
+
+function redirect($location=null){
+     return header("Location:". $location);  
+}
+
+function ifItIsMethod($method=null){
+    if($_SERVER['REQUEST_METHOD'] == strtoupper($method)){
+        return true;
+    }
+    return false;
+}
+
+function isLoggedin($user_role=null){
+    if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == $user_role){
+          // User is authorized, allow access to the content
+        return true;
+    }
+    return false;
+}
+
+function checkIfUserIsLoggedInAndRedirect($location=null){
+    if(isLoggedin('admin')){
+        redirect($location);
+    }else{
+        exit;
+    }
+}
+
+function echo1 ($string=null){
     if (isset($string)) {  echo $string; }
     return;
 }
+
 function escape($string){
     global $connection;
    return mysqli_real_escape_string($connection, trim(strip_tags($string)));
 }
 
-function confirm($result)
+function confirm($result=null)
 {
     global $connection;
     if (!$result) {
         die("QUERY FAILED " . mysqli_error($connection));
     }
+    return;
 }
 
 function insert_categories()
@@ -88,8 +118,8 @@ function findAllcategories()
         echo "<tr>";
         echo "<td>{$cat_id}</td>";
         echo "<td>{$cat_title}</td>";
-        echo "<td><a href='categories.php?delete={$cat_id}'>X</a></td>";
-        echo "<td><a href='categories.php?update={$cat_id}'>Edit</a></td>";
+        echo "<td><a class='btn btn-danger' href='categories.php?delete={$cat_id}'>X</a></td>";
+        echo "<td><a class='btn btn-info' href='categories.php?update={$cat_id}'>Edit</a></td>";
         echo "</tr>";
     }
 }
@@ -151,6 +181,7 @@ function delete_user()
     }
 }
 
+// session authenthication to access admin from login
 function is_authenticated() {
     global $connection;
     if (isset($_SESSION['session_token']) && isset($_SESSION['user_id'])) {
@@ -180,5 +211,120 @@ function is_authenticated() {
     } 
   }
 
+//   count in admin home
+  function recordCount($tablename=null){
+    global $connection;
+    $query = "SELECT * FROM " . $tablename;
+    $select_all_post = mysqli_query($connection, $query);
+    return mysqli_num_rows($select_all_post);
+  }
+// Counting the records of draft, subscribers and published posts
+  function checkStatus($tablename, $column, $status){
+    global $connection;
+    $query = "SELECT * FROM $tablename WHERE $column = '$status' ";
+    $result = mysqli_query($connection, $query);
+    return mysqli_num_rows($result);
+  }
 
-  
+
+  function is_admin($username=null){
+    global $connection;
+
+    $query = "SELECT user_role FROM users WHERE username = '$username'";
+    $result = mysqli_query($connection, $query);
+
+    $row = mysqli_fetch_array($result);
+
+    if($row['user_role'] == 'admin'){
+        return true;
+    }else{
+        return false;
+    }
+  }
+
+//   checking to see if username is already in database
+  function username_exists($username=null){
+    global $connection;
+
+    $query = "SELECT username FROM users WHERE username = '$username'";
+    $result = mysqli_query($connection, $query);
+    if(mysqli_num_rows($result) > 0) {
+        return true;
+    }else{
+        return false;
+    }
+  }
+
+//   checking to see if email is already in database
+  function email_exists($email=null){
+    global $connection;
+
+    $query = "SELECT user_email FROM users WHERE user_email = '$email'";
+    $result = mysqli_query($connection, $query);
+    if(mysqli_num_rows($result) > 0) {
+        return true;
+    }else{
+        return false;
+    }
+  }
+
+function register_user($username=null, $email=null, $password=null){
+    global $connection;
+        
+        $username =  escape($username);
+        $password =  escape($password);
+        $email    =  escape($email);
+        $user_password = password_hash($password, PASSWORD_ARGON2I);
+
+        $query = "INSERT INTO users (username, user_email, user_password, user_role) ";
+        $query .= "VALUES('{$username}', '{$email}', '{$user_password}', 'subscriber' )";
+        $register_user_query = mysqli_query($connection, $query);
+        confirm($register_user_query);
+    return;
+
+}
+
+function login_user($username=null, $password=null){
+    global $connection;
+    $username = escape($_POST['username']);
+    $password = escape($_POST['password']);
+
+    $stmt = $connection->prepare("SELECT * FROM users WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows == 1) {
+      $row = $result->fetch_assoc();
+      $db_user_id = $row['user_id'];
+      $db_username = $row['username'];
+      $db_user_firstname = $row['user_firstname'];
+      $db_user_lastname = $row['user_lastname'];
+      $db_user_password = $row['user_password'];
+      $db_user_role = $row['user_role'];
+
+      
+
+      if (password_verify($password, $db_user_password)) {
+        // login successful, set session variables and redirect to admin page
+        $session_token = bin2hex(random_bytes(16));
+        $expiry_time = time() + 1800; // Set expiry time to one hour from now
+        $stmt = $connection->prepare("INSERT INTO sessions (user_id, session_token, expiry_time) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $db_user_id, $session_token, $expiry_time);
+        $stmt->execute();
+
+        $_SESSION['username'] = $db_username;
+        $_SESSION['firstname'] = $db_user_firstname;
+        $_SESSION['lastname'] = $db_user_lastname;
+        $_SESSION['user_role'] = $db_user_role;
+
+        
+        redirect("/cms2/admin");
+      
+        } else {
+            return false;
+        }
+   }
+   return true; 
+}
+?>

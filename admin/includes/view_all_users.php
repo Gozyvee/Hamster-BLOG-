@@ -39,10 +39,10 @@
                          echo "<td>{$user_email}</td>";
                          echo "<td>{$user_role}</td>";
             
-                         echo "<td> <a href='users.php?change_to_admin={$user_id}'>Admin</a></td>";
-                         echo "<td> <a href='users.php?change_to_sub={$user_id}'>Sub</a></td>";
-                         echo "<td> <a href='users.php?source=edit_user&edit_user={$user_id}'>Edit</a></td>";
-                         echo "<td> <a href='users.php?delete={$user_id}'>Delete</a></td>";
+                         echo "<td> <a class='btn btn-success' href='users.php?change_to_admin={$user_id}'>Admin</a></td>";
+                         echo "<td> <a class='btn btn-info' href='users.php?change_to_sub={$user_id}'>Sub</a></td>";
+                         echo "<td> <a class='btn btn-warning' href='users.php?source=edit_user&edit_user={$user_id}'>Edit</a></td>";
+                         echo "<td> <a class='btn btn-danger' href='users.php?delete={$user_id}'>Delete</a></td>";
                          echo "</tr>";
                      }
                 ?>      

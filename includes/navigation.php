@@ -8,7 +8,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.php">Hamster</a>
+                <a class="navbar-brand" href="/cms2/index">Hamster</a>
             </div>
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
@@ -25,39 +25,45 @@
                         $registration_class = '';
 
                         $pageName = basename($_SERVER['PHP_SELF']);
-                        $registration = 'registration.php';
+                        $registration = '/cms2/registration';
 
                         if(isset($_GET['category']) && $_GET['category'] == $cat_id ){
                             $category_class = 'active';
                         }else if($pageName == $registration) {
                             $registration_class = 'active';
                         } 
-                         echo "<li class='{$category_class}'><a href ='category.php?category={$cat_id}'>{$cat_title}</a></li>";
+                        
+                        echo "<li class='{$category_class}'><a href ='/cms2/category/{$cat_id}'>{$cat_title}</a></li>";
                          }  
                     
                     ?>   
+                
                       <li>
                       <?php 
-                          if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                          if(isLoggedin('admin')) {
                               // User is authorized, allow access to the nav content
                               if(isset($_GET['p_id'])) {
                                   $the_post_id = $_GET['p_id'];
-                                  echo "<a href='admin/posts.php?source=edit_post&p_id={$the_post_id}'> Edit Post</a>";
+                                  echo "<a href='/cms2/admin/posts.php?source=edit_post&p_id={$the_post_id}'> Edit Post</a>";
                               }
                           }
                       ?>
                   </li>
-                  <li>
-                      <?php 
-                          if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
-                              // User is authorized, allow access to the nav content
-                              echo "<a href='admin'>Admin</a>";
-                              
-                          }
-                      ?>
-                  </li>
-                  <li class='<?php echo $registration_class; ?>'><a href="registration.php">Registration</a> </li>
-                 
+
+                  <?php if(isLoggedin('admin')): ?>
+                    <li>
+                        <a href='/cms2/admin'>Admin</a>
+                    </li>
+                    
+                    <li>
+                        <a href='/cms2/includes/logout.php'>Logout</a>
+                    </li>
+                    
+                    <?php else: ?>
+                        <li class=""><a href="/cms2/login">Login</a></li>
+                  <?php endif; ?>
+
+                  <li class='<?php echo $registration_class; ?>'><a href="/cms2/registration">Registration</a> </li>
               </ul>
           </div>
       </div>

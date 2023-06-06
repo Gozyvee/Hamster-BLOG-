@@ -8,14 +8,14 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.php"> Admin</a>
+                <a class="navbar-brand" href="/cms2/index"> Admin</a>
             </div>
             <!-- Top Menu Items -->
             <ul class="nav navbar-right top-nav">
 
                 <!-- <li><a href="">Users Online: <span id="online-user-count"></span> </a></li> -->
                 
-                <li><a href="../index.php">Home</a></li>
+                <li><a href="/cms2/index">Home</a></li>
                    <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <i class="fa fa-user"> </i> <?php echo $_SESSION['firstname']; ?> 

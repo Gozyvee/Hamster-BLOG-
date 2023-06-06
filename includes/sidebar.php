@@ -1,4 +1,14 @@
-  <!-- Blog Sidebar Widgets Column -->
+<?php 
+    if(ifItIsMethod('post')){
+
+		if(isset($_POST['username']) && isset($_POST['password'])){
+			login_user($_POST['username'], $_POST['password']);
+		}else{
+			redirect("index");
+		}
+	}
+  ?>
+<!-- Blog Sidebar Widgets Column -->
   <div class="col-md-4">
 <!-- Blog Search Well -->
 <div class="well">
@@ -17,12 +27,13 @@
 
 <!-- Login -->
 <div class="well">
+
     <?php if(isset($_SESSION['user_role'])): ?>
         <h4>Logged in as <?php echo $_SESSION['username'] ?></h4>
         <a href="includes/logout.php" class="btn btn-primary">Logout</a>
     <?php else: ?>
         <h4>Login</h4>
-    <form action="includes/login.php" method="post">
+    <form method="post">
     <div class="form-group">
         <input name="username" type="text" class="form-control" placeholder="enter username">
     </div>
@@ -35,11 +46,9 @@
     </div>
 </form>
     <?php endif; ?>
+
     
 </div>
-
-
-
 
 <!-- Blog Categories Query -->
 <div class="well">
@@ -65,8 +74,6 @@
     </div>
 </div>
 </div>
-
-
 
 <!-- Side Widget Well -->
 <?php include "widget.php" ?>

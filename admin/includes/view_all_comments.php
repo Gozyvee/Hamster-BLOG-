@@ -53,9 +53,9 @@
            }
            
            echo "<td>{$comment_date}</td>";
-           echo "<td> <a href='comments.php?approve={$comment_id}'>Approve</a></td>";
-           echo "<td> <a href='comments.php?disapprove={$comment_id}'>Disapprove</a></td>";
-           echo "<td> <a href='comments.php?delete={$comment_id}'>Delete</a></td>";
+           echo "<td> <a class='btn btn-success' href='comments.php?approve={$comment_id}'>Approve</a></td>";
+           echo "<td> <a class='btn btn-info' href='comments.php?disapprove={$comment_id}'>Disapprove</a></td>";
+           echo "<td> <a class='btn btn-danger' href='comments.php?delete={$comment_id}'>Delete</a></td>";
            echo "</tr>";
        }
         ?>
