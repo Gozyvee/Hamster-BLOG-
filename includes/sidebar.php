@@ -1,6 +1,5 @@
 <?php 
     if(ifItIsMethod('post')){
-
 		if(isset($_POST['username']) && isset($_POST['password'])){
 			login_user($_POST['username'], $_POST['password']);
 		}else{
@@ -34,20 +33,21 @@
     <?php else: ?>
         <h4>Login</h4>
     <form method="post">
-    <div class="form-group">
-        <input name="username" type="text" class="form-control" placeholder="enter username">
-    </div>
-    
-    <div class="input-group">
-        <input name="password" type="password" class="form-control" placeholder="enter password">
-        <span class="input-group-btn">
-            <button class="btn btn-primary" name="login" type="submit"> Submit </button>
-        </span>
-    </div>
-</form>
+        <div class="form-group">
+            <input name="username" type="text" class="form-control" placeholder="enter username">
+        </div>
+        
+        <div class="input-group">
+            <input name="password" type="password" class="form-control" placeholder="enter password">
+            <span class="input-group-btn">
+                <button class="btn btn-primary" name="login" type="submit"> Submit </button>
+            </span>
+        </div>
+        <div class="form-group">
+            <a href="forgot.php?forgot=<?php echo uniqid(true); ?>">forgot password?</a>
+        </div>
+    </form>
     <?php endif; ?>
-
-    
 </div>
 
 <!-- Blog Categories Query -->
@@ -74,6 +74,5 @@
     </div>
 </div>
 </div>
-
 <!-- Side Widget Well -->
-<?php include "widget.php" ?>
+<?php include "widget.php"; ?>

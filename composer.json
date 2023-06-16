@@ -1,0 +1,17 @@
+{
+    "name": "gozy/cms2",
+    "require": {
+        "phpmailer/phpmailer": "^6.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "Gozy\\Cms2\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Gozyvee",
+            "email": "obadiahvictory@gmail.com"
+        }
+    ]
+}

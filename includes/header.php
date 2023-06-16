@@ -1,6 +1,7 @@
-<?php session_start(); ?>
-<?php include "includes/db.php"; ?>
-<?php include_once "./admin/includes/functions.php"; ?>
+<?php session_start();
+include "includes/db.php"; 
+include_once "./admin/includes/functions.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

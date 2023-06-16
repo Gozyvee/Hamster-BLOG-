@@ -1,6 +1,4 @@
-<?php
-
-function redirect($location=null){
+<?php function redirect($location=null){
      return header("Location:". $location);  
 }
 

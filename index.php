@@ -1,28 +1,23 @@
-    <?php include "includes/header.php"; ?>
-    <!-- Navigation -->
-    <?php include "includes/navigation.php"; ?>    
+<?php include "includes/header.php"; ?>
+<!-- Navigation -->
+<?php include "includes/navigation.php"; ?>    
     <!-- Page Content -->
     <div class="container">
         <div class="row">
         <!-- Blog Entries Column -->
         <div class="col-md-8">
-
-            <?php
-            if (isset($_GET['page'])) {
-                $page = $_GET['page'];
-            } else {
-                $page = "";
-            }
-            if ($page == "" || $page == 1) {
-                $page_1 = 0;
-            } else {
-                $page_1 = ($page * 5) - 5;
-            }
-            ?>
-
-<?php
+    <?php
+        if (isset($_GET['page'])) {
+            $page = $_GET['page'];
+        } else {
+            $page = "";
+        }
+        if ($page == "" || $page == 1) {
+            $page_1 = 0;
+        } else {
+            $page_1 = ($page * 5) - 5;
+        } 
 // Get total number of posts
-
 if (isLoggedin('admin')) {
     $post_query_count = "SELECT COUNT(*) as count FROM posts ";
   } else {
@@ -95,4 +90,4 @@ foreach ($rows as $row) {
         }
         ?>
     </ul>
- <?php include "includes/footer.php"; ?>
+<?php include "includes/footer.php"; ?>
