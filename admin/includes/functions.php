@@ -1,28 +1,87 @@
-<?php function redirect($location=null){
+<?php
+//===== DATABASE HELPER FUNCTIONS =====// 
+function redirect($location=null){
      return header("Location:". $location);  
 }
 
+function query($query){
+    global $connection;
+    $result = mysqli_query($connection, $query);
+    return $result;
+}
+
+function count_records($result){
+    return mysqli_num_rows($result);
+}
+
+function confirm($result=null)
+{
+    global $connection;
+    if (!$result) {
+        die("QUERY FAILED " . mysqli_error($connection));
+    }
+    return;
+}
+
+//===== END DATABASE HELPER FUNCTIONS =====//
+function getPostLikes($post_id){
+    $result = query("SELECT * FROM likes WHERE post_id={$post_id}");
+    if(mysqli_num_rows($result) < 1){
+        return false;
+    }else{
+        return mysqli_num_rows($result);
+    }
+}
+
+//===== AUTHENTICATION HELPERS =====//
 function ifItIsMethod($method=null){
     if($_SERVER['REQUEST_METHOD'] == strtoupper($method)){
         return true;
     }
     return false;
+} 
+
+function is_admin(){
+    global $connection;
+    if(user_online()){
+    $query = "SELECT user_role FROM users WHERE username =". $_SESSION['username'] . "";
+    $result = mysqli_query($connection, $query);
+    $row = mysqli_fetch_array($result);
+
+    if($row['user_role'] == 'admin'){
+        return true;
+    }
+}
+  return false;
+}
+//===== END AUTHENTICATION HELPERS =====//
+
+//GENERAL HELPERS
+function get_user_name(){
+    return isset($_SESSION['username']) ? $_SESSION['username'] : null;
 }
 
 function isLoggedin($user_role=null){
     if(isset($_SESSION['user_role']) && $_SESSION['user_role'] == $user_role){
-          // User is authorized, allow access to the content
         return true;
     }
     return false;
 }
 
-function checkIfUserIsLoggedInAndRedirect($location=null){
-    if(isLoggedin('admin')){
-        redirect($location);
-    }else{
-        exit;
+function user_online(){
+    if(isset($_SESSION['user_role'])){
+        return true;
     }
+    return false;
+}
+
+function loggedInUserId(){
+    if(isLoggedin('admin') || isLoggedin('subscriber')){
+        $result = query("SELECT * FROM users WHERE username='" . $_SESSION['username'] ."'");
+        $user = mysqli_fetch_array($result);
+        return mysqli_num_rows($result) >= 1 ? $user['user_id'] : false;
+    }
+    return false;
 }
 
 function echo1 ($string=null){
@@ -34,15 +93,75 @@ function escape($string){
     global $connection;
    return mysqli_real_escape_string($connection, trim(strip_tags($string)));
 }
+// END GENERAL HELPERS
 
-function confirm($result=null)
-{
-    global $connection;
-    if (!$result) {
-        die("QUERY FAILED " . mysqli_error($connection));
+//USER SPECIFIC HELPERS
+function checkIfUserIsLoggedInAndRedirect($location=null){
+    if(isLoggedin('admin')){
+        redirect($location);
+    }else{
+      exit;
     }
-    return;
 }
+
+function userLikedThisPost($post_id = ""){
+    $result = query("SELECT * FROM likes WHERE user_id=" . loggedInUserId() . " AND post_id=$post_id");
+    confirm($result);
+    return mysqli_num_rows($result) >= 1 ? true : false;
+}
+
+function get_all_user_categories(){
+    $result = query("SELECT * FROM categories WHERE user_id=". loggedInUserId() ."");
+    return $result;
+}
+
+function get_all_user_comments(){
+    $result = query("SELECT * FROM comments WHERE user_id=". loggedInUserId() ."");
+    return $result;
+}
+
+
+function personal_record_count($user_id){
+    global $connection;
+    $query = "SELECT * FROM posts WHERE user_id= $user_id" ;
+    $select_all_post = query($query);
+    return mysqli_num_rows($select_all_post);
+  }
+
+  function post_user_comments_count(){
+    return query("SELECT * FROM posts
+    INNER JOIN comments ON posts.post_id = comments.comment_post_id
+    WHERE user_id=".loggedInUserId()."");
+
+  }
+
+function get_all_user_published_posts(){
+    return query("SELECT * FROM posts WHERE user_id=".loggedInUserId()." AND post_status='published'");
+}
+
+function get_all_user_draft_posts(){
+    return query("SELECT * FROM posts WHERE user_id=".loggedInUserId()." AND post_status='draft'");
+}
+
+
+function get_all_user_approved_posts_comments(){
+    return query("SELECT * FROM posts
+    INNER JOIN comments ON posts.post_id = comments.comment_post_id
+    WHERE user_id=".loggedInUserId()." AND comment_status='approved'");
+}
+
+
+function get_all_user_unapproved_posts_comments(){
+    return query("SELECT * FROM posts
+    INNER JOIN comments ON posts.post_id = comments.comment_post_id
+    WHERE user_id=".loggedInUserId()." AND comment_status='unapproved'");
+}
+
+//END USER SPECIFIC HELPERS
+
+
+
+
 
 function insert_categories()
 {
@@ -179,35 +298,6 @@ function delete_user()
     }
 }
 
-// session authenthication to access admin from login
-function is_authenticated() {
-    global $connection;
-    if (isset($_SESSION['session_token']) && isset($_SESSION['user_id'])) {
-      // Get the session token and user ID from the session
-      $session_token = $_SESSION['session_token'];
-      $user_id = $_SESSION['user_id'];
-      
-      // Check if the session token exists in the database
-      $stmt = $connection->prepare("SELECT * FROM sessions WHERE session_token = ? AND user_id = ?");
-      $stmt->bind_param("si", $session_token, $user_id);
-      $stmt->execute();
-      $result = $stmt->get_result();
-      
-      if ($result->num_rows == 1) {
-        // Session token found, check if it has expired
-        $row = $result->fetch_assoc();
-        $expiry_time = strtotime($row['expiry_time']);
-        
-        if ($expiry_time > time()) {
-          // Session token is valid and has not expired
-          return true;
-        } else {
-            // Session token is invalid or has expired
-             return false;
-        }
-      }
-    } 
-  }
 
 //   count in admin home
   function recordCount($tablename=null){
@@ -216,6 +306,8 @@ function is_authenticated() {
     $select_all_post = mysqli_query($connection, $query);
     return mysqli_num_rows($select_all_post);
   }
+
+ 
 // Counting the records of draft, subscribers and published posts
   function checkStatus($tablename, $column, $status){
     global $connection;
@@ -225,20 +317,6 @@ function is_authenticated() {
   }
 
 
-  function is_admin($username=null){
-    global $connection;
-
-    $query = "SELECT user_role FROM users WHERE username = '$username'";
-    $result = mysqli_query($connection, $query);
-
-    $row = mysqli_fetch_array($result);
-
-    if($row['user_role'] == 'admin'){
-        return true;
-    }else{
-        return false;
-    }
-  }
 
 //   checking to see if username is already in database
   function username_exists($username=null){
@@ -284,6 +362,7 @@ function register_user($username=null, $email=null, $password=null){
 
 function login_user($username=null, $password=null){
     global $connection;
+
     $username = escape($_POST['username']);
     $password = escape($_POST['password']);
 
@@ -301,8 +380,6 @@ function login_user($username=null, $password=null){
       $db_user_password = $row['user_password'];
       $db_user_role = $row['user_role'];
 
-      
-
       if (password_verify($password, $db_user_password)) {
         // login successful, set session variables and redirect to admin page
         $session_token = bin2hex(random_bytes(16));
@@ -315,6 +392,9 @@ function login_user($username=null, $password=null){
         $_SESSION['firstname'] = $db_user_firstname;
         $_SESSION['lastname'] = $db_user_lastname;
         $_SESSION['user_role'] = $db_user_role;
+        $_SESSION['user_id'] = $db_user_id; 
+        $_SESSION['session_token'] = $session_token;
+        $_SESSION['expiry_time'] = $expiry_time;
 
         
         redirect("/cms2/admin");
@@ -325,4 +405,34 @@ function login_user($username=null, $password=null){
    }
    return true; 
 }
+// session authenthication to access admin from login
+// function is_authenticated() {
+//     global $connection;
+//     if (isset($_SESSION['session_token']) && isset($_SESSION['user_id'])) {
+//       // Get the session token and user ID from the session
+//       $session_token = $_SESSION['session_token'];
+//       $user_id = $_SESSION['user_id'];
+      
+//       // Check if the session token exists in the database
+//       $stmt = $connection->prepare("SELECT * FROM sessions WHERE session_token = ? AND user_id = ?");
+//       $stmt->bind_param("si", $session_token, $user_id);
+//       $stmt->execute();
+//       $result = $stmt->get_result();
+      
+//       if ($result->num_rows == 1) {
+//         // Session token found, check if it has expired
+//         $row = $result->fetch_assoc();
+//         $expiry_time = strtotime($row['expiry_time']);
+        
+//         if ($expiry_time > time()) {
+//           // Session token is valid and has not expired
+//           return true;
+//         } else {
+//             // Session token is invalid or has expired
+//              return false;
+//         }
+//       }
+//     } 
+//   }
+
 ?>

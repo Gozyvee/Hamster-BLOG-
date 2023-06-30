@@ -1,12 +1,47 @@
-<?php include "includes/header.php"; ?>
+<?php include "includes/header.php";
+      include "includes/navigation.php"; 
+?>
 <!-- Navigation -->
-<?php include "includes/navigation.php"; ?>
+<?php 
+    if(isset($_POST['liked'])){
+        $post_id = $_POST['post_id'];
+        $user_id = $_POST['user_id'];
+        //fetching the post
+        $searchPostQuery = "SELECT * FROM posts WHERE post_id=$post_id";
+        $postResult = mysqli_query($connection, $searchPostQuery);
+        $post = mysqli_fetch_array($postResult);
+        $likes = $post['likes'];
+
+        //updating likes
+        mysqli_query($connection, "UPDATE posts SET likes=$likes+1 WHERE post_id=$post_id");
+
+        //create likes for post
+        mysqli_query($connection, "INSERT INTO likes(user_id, post_id) VALUES($user_id, $post_id)");
+        exit();
+    }
+    if(isset($_POST['unliked'])){
+        $post_id = $_POST['post_id'];
+        $user_id = $_POST['user_id'];
+        //fetching the post
+        $searchPostQuery = "SELECT * FROM posts WHERE post_id=$post_id";
+        $postResult = mysqli_query($connection, $searchPostQuery);
+        $post = mysqli_fetch_array($postResult);
+        $likes = $post['likes'];
+        
+        //delete likes
+        mysqli_query($connection, "DELETE FROM likes WHERE post_id=$post_id AND user_id=$user_id");
+       
+        //deleting likes
+        mysqli_query($connection, "UPDATE posts SET likes=$likes-1 WHERE post_id=$post_id");
+        exit();
+    }
+?>
 <!-- Page Content -->
 <div class="container">
 
     <div class="row ">
 
-        <!-- Blog Entries Column -->
+        <!-- Blog  Entries Column -->
         <div class="col-md-8">
 
             <?php //Add posts query
@@ -16,14 +51,14 @@
                 $view_post_query = "UPDATE posts SET post_view_count = post_view_count + 1 WHERE post_id = $the_post_id";
                 $send_query = mysqli_query($connection, $view_post_query);
 
-                if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+                if (isLoggedin('admin')) {
                       $query = "SELECT * FROM posts WHERE post_id = $the_post_id";
                 }else{
                     $query = "SELECT * FROM posts WHERE post_id = $the_post_id AND post_status = 'published' ";
                 }
                 $select_posts = mysqli_query($connection, $query);
                 if(mysqli_num_rows($select_posts) < 1) {
-                    echo "<h1> No Posts Available</h1>";
+                    echo "<h1> No Posts Available</h1><small>You need to login to view</small>";
                 } else {
                  while ($row = mysqli_fetch_assoc($select_posts)) {
                     $post_title = $row['post_title'];
@@ -43,12 +78,33 @@
                     <a href="#"><?php echo $post_title ?></a>
                 </h2>
                 <p class="lead">
-                    by <a href="index.php"><?php echo $post_user ?></a>
+                    by <a href="#"><?php echo $post_user ?></a>
                 </p>
                 <p><span class="glyphicon glyphicon-time"></span> <?php echo $post_date ?> </p>
                 <hr>
-                <img class="img-responsive" src="images/<?php echo $post_image; ?>" alt="">
+                <img class="img-responsive" src="/cms2/images/<?php echo htmlspecialchars($post_image); ?>" alt="">
                 <hr>
+                <?php if(isLoggedin('admin') || isLoggedin('subscriber')): ?>
+
+                <div class="row">
+                    <p class="pull-left ml-3">
+                        <a class="<?php echo userLikedThisPost($the_post_id) ? 'unlike' : 'like'; ?>" href="" data-toggle="tooltip"
+                            title="<?php echo userLikedThisPost($the_post_id) ? 'you have already liked' : 'Want to like?';?>"> 
+                            <span class="glyphicon glyphicon-thumbs-up"><?php echo userLikedThisPost($the_post_id) ? 'Unlike' : 'Like'; ?></span>
+                            <span> <?php echo getPostLikes($the_post_id); ?></span>
+                       </a>
+                    </p>
+                </div>
+                <div class="clearfix"></div>
+                <?php else: ?>
+
+                    <div class="row">
+                        <p class="pull_left">
+                            You need to <a href="/cms2/login.php">Login</a> to like
+                        </p>
+                    </div>
+                <?php endif; ?>
+
                 <p><?php echo $post_content ?></p>
                 <hr>
         
@@ -147,3 +203,34 @@
     </div>
     <hr>
     <?php include "includes/footer.php"; ?>
+    <script>
+        $(document).ready(function(){
+            var post_id = <?php echo $the_post_id ?>;
+            var user_id = <?php echo loggedInUserId() ?>;
+            //like
+            $('.like').click(function(){
+                $.ajax({
+                    url: "/cms2/post.php?p_id=<?php echo $the_post_id; ?>",
+                    type: 'post',
+                    data: {
+                        liked: 1,
+                        'post_id': post_id,
+                        'user_id': user_id 
+                    }
+                })
+            });
+            //unlike
+            $('.unlike').click(function(){
+                $.ajax({
+                    url: "/cms2/post.php?p_id=<?php echo $the_post_id; ?>",
+                    type: 'post',
+                    data: {
+                        unliked: 1,
+                        'post_id': post_id,
+                        'user_id': user_id 
+                    }
+                })
+            });
+        });
+        $('data-toggle="tooltip"').tooltip();
+    </script>

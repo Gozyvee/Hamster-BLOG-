@@ -11,10 +11,12 @@ if (isset($_POST['create_post'])) {
     $post_tags = escape($_POST['post_tags']);
     $post_content = escape($_POST['post_content']);
     $post_date = escape(date('d-m-y'));
+    $user_id = $_SESSION['user_id'];
 
-    $stmt = mysqli_prepare($connection, "INSERT INTO posts(post_category_id, post_title, post_user, post_date, post_image, post_content, post_tags, post_status) VALUES (?, ?, ?, now(), ?, ?, ?, ?)");
+    $stmt = mysqli_prepare($connection, "INSERT INTO posts(post_category_id, user_id, post_title, post_user, post_date, post_image, post_content, post_tags, post_status) 
+    VALUES (?, ?, ?, ?, now(), ?, ?, ?, ?)");
 
-    mysqli_stmt_bind_param($stmt, "issssss", $post_category_id, $post_title, $post_user, $post_image, $post_content, $post_tags, $post_status);
+    mysqli_stmt_bind_param($stmt, "iissssss", $post_category_id, $user_id, $post_title, $post_user, $post_image, $post_content, $post_tags, $post_status);
 
     mysqli_stmt_execute($stmt);
 

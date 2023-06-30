@@ -6,37 +6,17 @@
 <?php
 
 // Check if the user is logged in and has the admin role
-if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
-  // User is authorized, allow access to the page
-} else {
-  // User is not authorized, redirect to login page
-  header("Location: ../index.php");
-  exit();
-}
+
 if (isset($_SESSION['session_token']) && isset($_SESSION['user_id'])) {
-  // Get the session token and user ID from the session
-  $session_token = $_SESSION['session_token'];
-  $user_id = $_SESSION['user_id'];
-
-  // Check if the session token exists in the database
-  $stmt = $connection->prepare("SELECT * FROM sessions WHERE session_token = ? AND user_id = ?");
-  $stmt->bind_param("si", $session_token, $user_id);
-  $stmt->execute();
-  $result = $stmt->get_result();
-
-  if ($result->num_rows == 1) {
-    // Session token found, check if it has expired
-    $row = $result->fetch_assoc();
-    $expiry_time = strtotime($row['expiry_time']);
-
-    if ($expiry_time > time()) {
-      // Session token is valid and has not expired
-      return true;
-    } else {
-      // Session token is invalid or has expired
-      return false;
-    }
-  }
+  if (isset($_SESSION['user_role']) && $_SESSION['user_role'] == 'admin') {
+    // User is authorized, allow access to the page
+  } else {
+    // User is not authorized, redirect to login page
+    header("Location: ../index.php");
+    exit();
+  } 
+}else{
+  exit();
 }
 
 ?>
